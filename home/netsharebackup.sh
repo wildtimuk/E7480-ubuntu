@@ -56,12 +56,30 @@ else
     exit 2
 fi
 
+#Lets try to relaod all mounts in fstab
+#These should persist after a reboot but may fail of the other remote deice is offline
+
+echo "trying to remount all folders in fstab"
+log_message "trying to remount all folders entered into fstab"
+mount -a
+#Check of the mount -a command was successfuly
+if [$? -eq 0] then
+    echo "fstab reloaded"
+    log_message "fstab successfully reloaded"
+else 
+    echo "fstab failed"
+    log_message "fstab reload failed"
+
+fi
+
+
+
 # Perform backup using rsync
 echo "Starting backup"
 log_message "Starting backup..."
 
 #Insert rsync lines here
-
+#Lg messages 
 #if [ $? -eq 0 ]; then
 #    log_message "Backup completed successfully."
 #    send_email "Backup SUCCESS" "Backup completed successfully at $DATE."
@@ -69,3 +87,5 @@ log_message "Starting backup..."
 #    log_message "ERROR: Backup failed during rsync."
 #    send_email "Backup FAILED" "Backup failed during rsync at $DATE."
 #fi
+
+
