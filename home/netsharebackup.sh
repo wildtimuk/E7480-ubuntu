@@ -41,7 +41,7 @@ if ping -c 2 "$REMOTE_SERVER" > /dev/null 2>&1; then
 else
     echo "Remote server not online"
     log_message "ERROR: Remote server offline."
-    #send_email "Backup FAILED" "Remote server $REMOTE_SERVER is offline. Backup aborted."
+    send_email "Backup FAILED" "Remote server $REMOTE_SERVER is offline. Backup aborted."
     exit 1
 fi
 
@@ -53,7 +53,6 @@ if findmnt -M /mnt/netshare &> /dev/null 2>&1; then
 else
     echo "Remote location not mounted"
     log_message "Shared folder is not mounted."
-#    exit 2
 
     #Lets try to relaod all mounts in fstab
     #These should persist after a reboot but may fail of the other remote deice is offline
@@ -68,26 +67,27 @@ else
     else 
         echo "fstab failed"
         log_message "fstab reload failed"
-
+        send_email "Mount Failed" "Remote server $REMOTE_SERVER is not mounted. Backup aborted."
+    exit 2
     fi
-
 fi
+
 # Perform backup using rsync
 echo "Starting backup"
 log_message "Starting backup..."
 
 #Insert rsync lines here. Eg the following will copy files from the home folder to the TrueNAS mounted drive
-sudo rsync -a /home/timw/docker /mnt/netshare/E7480
+sudo rsync -av /home/timw/docker /mnt/netshare/E7480 --log-file=/var/log/rsync.log
 
 #Log messages 
 if [ $? -eq 0 ]; then
     log_message "Backup completed successfully."
-#    send_email "Backup SUCCESS" "Backup completed successfully at $DATE."
+    send_email "Backup SUCCESS" "Backup completed successfully at $DATE."
 else
     log_message "ERROR: Backup failed during rsync."
-#    send_email "Backup FAILED" "Backup failed during rsync at $DATE."
+    send_email "Backup process FAILED" "Backup failed during rsync at $DATE."
 fi
 
-echo "Finished"
-log_message "Finished..."
 
+echo "Script Finished"
+log_message "Script Finished..."
