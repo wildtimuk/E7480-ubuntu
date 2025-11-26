@@ -53,39 +53,41 @@ if findmnt -M /mnt/netshare &> /dev/null 2>&1; then
 else
     echo "Remote location not mounted"
     log_message "Shared folder is not mounted."
-    exit 2
+#    exit 2
+
+    #Lets try to relaod all mounts in fstab
+    #These should persist after a reboot but may fail of the other remote deice is offline
+
+    echo "trying to remount all folders in fstab"
+    log_message "trying to remount all folders entered into fstab"
+    mount -a
+    #Check of the mount -a command was successfuly
+    if [$? -eq 0]; then
+        echo "fstab reloaded"
+        log_message "fstab successfully reloaded"
+    else 
+        echo "fstab failed"
+        log_message "fstab reload failed"
+
+    fi
+
 fi
-
-#Lets try to relaod all mounts in fstab
-#These should persist after a reboot but may fail of the other remote deice is offline
-
-echo "trying to remount all folders in fstab"
-log_message "trying to remount all folders entered into fstab"
-mount -a
-#Check of the mount -a command was successfuly
-if [$? -eq 0] then
-    echo "fstab reloaded"
-    log_message "fstab successfully reloaded"
-else 
-    echo "fstab failed"
-    log_message "fstab reload failed"
-
-fi
-
-
-
 # Perform backup using rsync
 echo "Starting backup"
 log_message "Starting backup..."
 
-#Insert rsync lines here
-#Lg messages 
-#if [ $? -eq 0 ]; then
-#    log_message "Backup completed successfully."
-#    send_email "Backup SUCCESS" "Backup completed successfully at $DATE."
-#else
-#    log_message "ERROR: Backup failed during rsync."
-#    send_email "Backup FAILED" "Backup failed during rsync at $DATE."
-#fi
+#Insert rsync lines here. Eg the following will copy files from the home folder to the TrueNAS mounted drive
+sudo rsync -a /home/timw/docker /mnt/netshare/E7480
 
+#Log messages 
+if [ $? -eq 0 ]; then
+    log_message "Backup completed successfully."
+#    send_email "Backup SUCCESS" "Backup completed successfully at $DATE."
+else
+    log_message "ERROR: Backup failed during rsync."
+#    send_email "Backup FAILED" "Backup failed during rsync at $DATE."
+fi
+
+echo "Finished"
+log_message "Finished..."
 
