@@ -6,7 +6,7 @@ MESSAGE="This is a new message"
 curl --request POST \
   --url https://api.brevo.com/v3/smtp/email \
   --header 'accept: application/json' \
-  --header 'api-key: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' \
+  --header 'api-key:mysecretkey' \
   --header 'content-type: application/json' \
   --data '{  
    "sender":{  
