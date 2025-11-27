@@ -11,7 +11,7 @@
 
 
 MESSAGE="This is a new message"
-SUBJECT="Some subject
+SUBJECT="Some subject"
 curl --request POST \
   --url https://api.brevo.com/v3/smtp/email \
   --header 'accept: application/json' \

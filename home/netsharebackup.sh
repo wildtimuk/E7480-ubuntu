@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#Version 2 to include API email
 # Configuration
 SOURCE_DIR="/path/to/local/files"
 DEST_DIR="/mnt/netshare"
@@ -18,9 +18,32 @@ log_message() {
 
 # Email function
 send_email() {
+#Comment out to use API methid below instead
+#    SUBJECT="$1"
+#    BODY="$2"
+#    echo "$BODY" | mail -s "$SUBJECT" "$EMAIL"
+
+    MESSAGE="$2"
     SUBJECT="$1"
-    BODY="$2"
-    echo "$BODY" | mail -s "$SUBJECT" "$EMAIL"
+    curl --request POST \
+    --url https://api.brevo.com/v3/smtp/email \
+    --header 'accept: application/json' \
+    --header 'api-key:mysecretkey' \
+    --header 'content-type: application/json' \
+    --data '{  
+    "sender":{  
+        "name":"Th Wildhoose Homelab",
+        "email":"homelab@thewildhoose.co.uk"
+    },
+    "to":[  
+        {  
+            "email":"wildtim@hotmail.com",
+            "name":"Tim"
+        }
+    ],
+    "subject":"'"$SUBJECT"'",
+    "htmlContent":"<html><head></head><body><p>'"$MESSAGE"'</p>Thankyou,</p>The Homelab team</body></html>"
+    }'
 }
 
 # Check remote server availability
